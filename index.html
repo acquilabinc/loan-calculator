@@ -73,23 +73,24 @@
       <p>Estimated Monthly Payment</p>
       <h1 id="monthlyPayment">$0</h1>
       <p><span id="apr">0.00%</span> APR</p>
-      <p>Total Cost: $<span id="totalCost">0.00</span></p>
+      <p>Total Cost: $<span id="totalCost">0</span></p>
+      <p>Interest Paid: $<span id="interestPaid">0</span></p>
     </div>
     <div class="inputs">
       <div class="slider-container">
         <label for="loanAmount">Amount</label>
-        <input type="range" id="loanAmount" min="2500" max="40000" value="10000" step="500" />
+        <input type="range" id="loanAmount" min="100" max="40000" value="10000" step="100" />
         <div class="slider-value" id="loanAmountValue">$10,000</div>
       </div>
       <div class="slider-container">
         <label for="loanTerm">Length</label>
-        <input type="range" id="loanTerm" min="12" max="84" value="36" step="12" />
-        <div class="slider-value" id="loanTermValue">36 Months</div>
+        <input type="range" id="loanTerm" min="1" max="84" value="12" step="1" />
+        <div class="slider-value" id="loanTermValue">12 Months</div>
       </div>
       <div class="slider-container">
         <label for="creditScore">Credit Score</label>
-        <input type="range" id="creditScore" min="500" max="850" value="650" step="10" />
-        <div class="slider-value" id="creditScoreValue">650</div>
+        <input type="range" id="creditScore" min="500" max="850" value="700" step="10" />
+        <div class="slider-value" id="creditScoreValue">700</div>
       </div>
     </div>
   </div>
@@ -97,22 +98,22 @@
   <script>
     function calculateAPR(creditScore, loanTerm) {
       if (creditScore >= 500 && creditScore <= 599) {
-        if (loanTerm <= 12) return 0.3099;
-        else if (loanTerm <= 36) return 0.3599;
-        else if (loanTerm <= 60) return 0.3399;
-        else if (loanTerm <= 84) return 0.3299;
+        if (loanTerm <= 12) return 0.3099; // 30.99%
+        else if (loanTerm <= 36) return 0.3599; // 35.99%
+        else if (loanTerm <= 60) return 0.3399; // 33.99%
+        else if (loanTerm <= 84) return 0.3299; // 32.99%
       } else if (creditScore >= 600 && creditScore <= 699) {
-        if (loanTerm <= 12) return 0.1899;
-        else if (loanTerm <= 36) return 0.1999;
-        else if (loanTerm <= 60) return 0.2199;
-        else if (loanTerm <= 84) return 0.2299;
+        if (loanTerm <= 12) return 0.1899; // 18.99%
+        else if (loanTerm <= 36) return 0.1999; // 19.99%
+        else if (loanTerm <= 60) return 0.2199; // 21.99%
+        else if (loanTerm <= 84) return 0.2299; // 22.99%
       } else if (creditScore >= 700 && creditScore <= 850) {
-        if (loanTerm <= 12) return 0.0799;
-        else if (loanTerm <= 36) return 0.0899;
-        else if (loanTerm <= 60) return 0.1199;
-        else if (loanTerm <= 84) return 0.1399;
+        if (loanTerm <= 12) return 0.0799; // 7.99%
+        else if (loanTerm <= 36) return 0.0899; // 8.99%
+        else if (loanTerm <= 60) return 0.1199; // 11.99%
+        else if (loanTerm <= 84) return 0.1399; // 13.99%
       }
-      return 0.36;
+      return 0.36; // Default max APR cap
     }
 
     function calculateMonthlyPayment(loanAmount, apr, loanTerm) {
@@ -132,14 +133,16 @@
       const apr = calculateAPR(creditScore, loanTerm);
       const monthlyPayment = calculateMonthlyPayment(loanAmount, apr, loanTerm);
       const totalCost = monthlyPayment * loanTerm;
+      const interestPaid = totalCost - loanAmount;
 
-      // Update values in the UI
+      // Update UI
       document.getElementById('loanAmountValue').textContent = `$${loanAmount.toLocaleString()}`;
       document.getElementById('loanTermValue').textContent = `${loanTerm} Months`;
       document.getElementById('creditScoreValue').textContent = `${creditScore}`;
       document.getElementById('apr').textContent = `${(apr * 100).toFixed(2)}%`;
-      document.getElementById('monthlyPayment').textContent = `$${monthlyPayment.toFixed(2)}`;
-      document.getElementById('totalCost').textContent = `${totalCost.toFixed(2)}`;
+      document.getElementById('monthlyPayment').textContent = `$${Math.round(monthlyPayment).toLocaleString()}`;
+      document.getElementById('totalCost').textContent = `$${Math.round(totalCost).toLocaleString()}`;
+      document.getElementById('interestPaid').textContent = `$${Math.round(interestPaid).toLocaleString()}`;
     }
 
     // Event Listeners
