@@ -116,11 +116,13 @@
 
     function getInterpolatedAPR(creditScore, loanTerm) {
       const scoreKeys = Object.keys(aprMapping).map(Number);
-      const closestScore = scoreKeys.reduce((prev, curr) => Math.abs(curr - creditScore) < Math.abs(prev - creditScore) ? curr : prev);
-      const termKeys = Object.keys(aprMapping[closestScore]).map(Number);
-      const closestTerm = termKeys.reduce((prev, curr) => Math.abs(curr - loanTerm) < Math.abs(prev - loanTerm) ? curr : prev);
-      return aprMapping[closestScore][closestTerm];
-    }
+      const closestScore = scoreKeys.reduce((prev, curr) =>
+        Math.abs(curr - creditScore) < Math.abs(prev - creditScore) ? curr : prev
+      );
 
-    function calculateMonthlyInterest(loanAmount, apr) {
-      const monthlyRate = apr
+      const termKeys = Object.keys(aprMapping[closestScore]).map(Number);
+      const closestTerm = termKeys.reduce((prev, curr) =>
+        Math.abs(curr - loanTerm) < Math.abs(prev - loanTerm) ? curr : prev
+      );
+
+      return aprMapping[closestScore][closestTerm] || 0; // Return 0 if no match
