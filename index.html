@@ -11,11 +11,11 @@
     <div class="results">
       <p>Estimated Monthly Interest Payment</p>
       <h1 id="monthlyInterest">$0</h1>
-      <p id="aprDisplay">0.00% APR</p>
-      <div class="approval-odds">
-        <div id="oddsBar" class="odds-bar"></div>
-        <p id="oddsText" class="odds-text">Enter values to see your approval odds!</p>
+      <p><span id="apr">0.00%</span> APR</p>
+      <div class="approval-bar-container">
+        <div id="approvalBar" class="approval-bar"></div>
       </div>
+      <p id="approvalText" class="approval-text">Let's get started!</p>
     </div>
     <div class="inputs">
       <div class="slider-container">
@@ -34,8 +34,9 @@
         <div class="slider-value" id="creditScoreValue">700</div>
       </div>
     </div>
-    <button id="ctaButton" class="cta-button">Check Your Rate</button>
+    <a href="#" class="cta-button">Check Your Rate</a>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
