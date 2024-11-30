@@ -100,7 +100,7 @@
       500: { "1–12": 30.99, "13–36": 35.99, "37–60": 33.99, "61–84": 32.99 },
       600: { "1–12": 18.99, "13–36": 19.99, "37–60": 21.99, "61–84": 22.99 },
       700: { "1–12": 7.99, "13–36": 8.99, "37–60": 11.99, "61–84": 13.99 },
-      850: { "1–12": 7.99, "13–36": 8.99, "37–60": 11.99, "61–84": 13.99 },
+      850: { "1–12": 8.00, "13–36": 8.00, "37–60": 8.00, "61–84": 8.00 },
     };
 
     function interpolateAPR(creditScore, loanTerm) {
@@ -126,7 +126,7 @@
           return lowerAPR + ratio * (upperAPR - lowerAPR);
         }
       }
-      return 36.0; // Default max APR
+      return 8.00; // Default minimum APR
     }
 
     function calculateMonthlyInterest(loanAmount, apr) {
