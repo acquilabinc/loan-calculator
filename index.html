@@ -15,6 +15,7 @@
       align-items: center;
       height: 100vh;
     }
+
     .calculator-container {
       display: flex;
       flex-direction: column;
@@ -25,34 +26,42 @@
       padding: 20px;
       width: 600px;
     }
+
     .results {
       text-align: center;
       padding-bottom: 20px;
       border-bottom: 2px solid #ececec;
     }
+
     .results h1 {
       font-size: 48px;
       margin: 0;
     }
+
     .results p {
       margin: 10px 0;
       font-size: 18px;
     }
+
     .inputs {
       padding-top: 20px;
     }
+
     .slider-container {
       margin-bottom: 20px;
     }
+
     .slider-container label {
       display: block;
       font-weight: bold;
       margin-bottom: 5px;
       font-size: 16px;
     }
+
     .slider-container input[type="range"] {
       width: 100%;
     }
+
     .slider-value {
       text-align: right;
       font-weight: bold;
@@ -80,38 +89,36 @@
       </div>
       <div class="slider-container">
         <label for="creditScore">Credit Score</label>
-        <input type="range" id="creditScore" min="500" max="850" value="700" step="20" />
+        <input type="range" id="creditScore" min="500" max="850" value="700" step="10" />
         <div class="slider-value" id="creditScoreValue">700</div>
       </div>
     </div>
   </div>
 
   <script>
-    const aprMapping = {
-      500: { 1: 36.0, 12: 36.0, 13: 34.0, 36: 34.0, 37: 32.0, 60: 32.0, 61: 30.0, 84: 30.0 },
-      520: { 1: 34.0, 12: 34.0, 13: 32.0, 36: 32.0, 37: 30.0, 60: 30.0, 61: 28.0, 84: 28.0 },
-      540: { 1: 32.0, 12: 32.0, 13: 30.0, 36: 30.0, 37: 28.0, 60: 28.0, 61: 26.0, 84: 26.0 },
-      560: { 1: 30.0, 12: 30.0, 13: 28.0, 36: 28.0, 37: 26.0, 60: 26.0, 61: 24.0, 84: 24.0 },
-      580: { 1: 28.0, 12: 28.0, 13: 26.0, 36: 26.0, 37: 24.0, 60: 24.0, 61: 22.0, 84: 22.0 },
-      600: { 1: 26.0, 12: 26.0, 13: 24.0, 36: 24.0, 37: 22.0, 60: 22.0, 61: 20.0, 84: 20.0 },
-      620: { 1: 24.0, 12: 24.0, 13: 22.0, 36: 22.0, 37: 20.0, 60: 20.0, 61: 18.0, 84: 18.0 },
-      640: { 1: 22.0, 12: 22.0, 13: 20.0, 36: 20.0, 37: 18.0, 60: 18.0, 61: 16.0, 84: 16.0 },
-      660: { 1: 20.0, 12: 20.0, 13: 18.0, 36: 18.0, 37: 16.0, 60: 16.0, 61: 14.0, 84: 14.0 },
-      680: { 1: 18.0, 12: 18.0, 13: 16.0, 36: 16.0, 37: 14.0, 60: 14.0, 61: 12.0, 84: 12.0 },
-      700: { 1: 16.0, 12: 16.0, 13: 14.0, 36: 14.0, 37: 12.0, 60: 12.0, 61: 10.0, 84: 10.0 },
-      720: { 1: 14.0, 12: 14.0, 13: 12.0, 36: 12.0, 37: 10.0, 60: 10.0, 61: 8.0, 84: 8.0 },
-    };
-
-    function getAPR(creditScore, loanTerm) {
-      const roundedCreditScore = Math.floor(creditScore / 20) * 20;
-      if (aprMapping[roundedCreditScore] && aprMapping[roundedCreditScore][loanTerm]) {
-        return aprMapping[roundedCreditScore][loanTerm];
+    function calculateAPR(creditScore, loanTerm) {
+      if (creditScore >= 500 && creditScore <= 599) {
+        if (loanTerm <= 12) return 0.3099; // 30.99%
+        else if (loanTerm <= 36) return 0.3599; // 35.99%
+        else if (loanTerm <= 60) return 0.3399; // 33.99%
+        else if (loanTerm <= 84) return 0.3299; // 32.99%
+      } else if (creditScore >= 600 && creditScore <= 699) {
+        if (loanTerm <= 12) return 0.1899; // 18.99%
+        else if (loanTerm <= 36) return 0.1999; // 19.99%
+        else if (loanTerm <= 60) return 0.2199; // 21.99%
+        else if (loanTerm <= 84) return 0.2299; // 22.99%
+      } else if (creditScore >= 700 && creditScore <= 850) {
+        if (loanTerm <= 12) return 0.0799; // 7.99%
+        else if (loanTerm <= 36) return 0.0899; // 8.99%
+        else if (loanTerm <= 60) return 0.1199; // 11.99%
+        else if (loanTerm <= 84) return 0.1399; // 13.99%
       }
-      return 0; // Default APR if no match found
+      return 0.36; // Default max APR cap
     }
 
     function calculateMonthlyInterest(loanAmount, apr) {
-      return (loanAmount * (apr / 12 / 100)).toFixed(2);
+      const monthlyRate = apr / 12;
+      return loanAmount * monthlyRate;
     }
 
     function updateCalculator() {
@@ -119,20 +126,23 @@
       const loanTerm = parseInt(document.getElementById('loanTerm').value, 10);
       const creditScore = parseInt(document.getElementById('creditScore').value, 10);
 
-      const apr = getAPR(creditScore, loanTerm);
+      const apr = calculateAPR(creditScore, loanTerm);
       const monthlyInterest = calculateMonthlyInterest(loanAmount, apr);
 
+      // Update UI
       document.getElementById('loanAmountValue').textContent = `$${loanAmount.toLocaleString()}`;
       document.getElementById('loanTermValue').textContent = `${loanTerm} Months`;
       document.getElementById('creditScoreValue').textContent = `${creditScore}`;
-      document.getElementById('apr').textContent = `${apr.toFixed(2)}%`;
-      document.getElementById('monthlyInterest').textContent = `$${monthlyInterest}`;
+      document.getElementById('apr').textContent = `${(apr * 100).toFixed(2)}%`;
+      document.getElementById('monthlyInterest').textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
     }
 
+    // Event Listeners
     document.getElementById('loanAmount').addEventListener('input', updateCalculator);
     document.getElementById('loanTerm').addEventListener('input', updateCalculator);
     document.getElementById('creditScore').addEventListener('input', updateCalculator);
 
+    // Initialize
     updateCalculator();
   </script>
 </body>
