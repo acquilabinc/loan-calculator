@@ -271,12 +271,12 @@
       // Update approval text
       approvalText.textContent =
         approvalOdds > 70
-          ? 'Great choice! Lenders love this combination!'
-          : approvalOdds > 40
-          ? 'Looking good! You’re on the right track.'
-          : approvalOdds > 20
-          ? 'Not bad! Consider lowering your loan amount or term for better chances.'
-          : 'This combination may need tweaking. Try lowering your loan amount.';
+        ? 'Great choice! Lenders love this combination.'
+        : approvalOdds > 40
+        ? 'Looking solid! Reducing the loan amount could improve your chances.'
+        : approvalOdds > 20
+        ? 'Approval is possible! Lowering the amount or term could help.'
+        : 'Approval is challenging under these terms but there is always a chance.';
     }
 
     document.getElementById('loanAmount').addEventListener('input', updateCalculator);
