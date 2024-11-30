@@ -25,6 +25,8 @@
       padding: 30px;
       max-width: 600px;
       width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
     }
 
     .results {
@@ -102,7 +104,7 @@
     .cta-button {
       margin-top: 20px;
       display: block;
-      width: 100%;
+      width: 100%; /* Button width matches container */
       text-align: center;
       padding: 15px 20px;
       background-color: #0984e3;
@@ -113,6 +115,7 @@
       border: none;
       text-decoration: none;
       transition: background 0.3s ease;
+      box-sizing: border-box;
     }
 
     .cta-button:hover {
@@ -144,7 +147,7 @@
         <div class="slider-value" id="creditScoreValue">700</div>
       </div>
     </div>
-    <a href="#" class="cta-button">Apply Now</a>
+    <a href="#" class="cta-button">Check Your Rate</a>
   </div>
 
   <script>
@@ -155,7 +158,7 @@
       850: { base: 8.00 },
     };
 
-    const termFactor = 5; // Maximum APR adjustment for loan term
+    const termFactor = 5;
 
     function interpolateAPR(creditScore, loanTerm) {
       const creditScores = Object.keys(aprMapping).map(Number).sort((a, b) => a - b);
