@@ -97,17 +97,20 @@
 
   <script>
     const aprMapping = {
-      500: { "1–12": 36.00, "13–36": 36.00, "37–60": 36.00, "61–84": 36.00 },
-      600: { "1–12": 22.00, "13–36": 22.00, "37–60": 22.00, "61–84": 22.00 },
-      700: { "1–12": 12.00, "13–36": 12.00, "37–60": 12.00, "61–84": 12.00 },
-      850: { "1–12": 8.00, "13–36": 8.00, "37–60": 8.00, "61–84": 8.00 },
+      500: { base: 36.00 },
+      600: { base: 22.00 },
+      700: { base: 12.00 },
+      850: { base: 8.00 },
     };
+
+    const termFactor = 5; // Maximum APR adjustment for loan term
 
     function interpolateAPR(creditScore, loanTerm) {
       const creditScores = Object.keys(aprMapping).map(Number).sort((a, b) => a - b);
       let lowerScore = creditScores[0];
       let upperScore = creditScores[creditScores.length - 1];
 
+      // Find closest credit score range
       for (let i = 0; i < creditScores.length - 1; i++) {
         if (creditScore >= creditScores[i] && creditScore <= creditScores[i + 1]) {
           lowerScore = creditScores[i];
@@ -116,17 +119,22 @@
         }
       }
 
-      const termKeys = Object.keys(aprMapping[lowerScore]);
-      for (let termRange of termKeys) {
-        const [minTerm, maxTerm] = termRange.split("–").map(Number);
-        if (loanTerm >= minTerm && loanTerm <= maxTerm) {
-          const lowerAPR = aprMapping[lowerScore][termRange];
-          const upperAPR = aprMapping[upperScore][termRange];
-          const ratio = (creditScore - lowerScore) / (upperScore - lowerScore);
-          return lowerAPR + ratio * (upperAPR - lowerAPR);
-        }
-      }
-      return 8.00; // Default minimum APR
+      // Interpolate base APR based on credit score
+      const baseAPR =
+        aprMapping[lowerScore].base +
+        ((creditScore - lowerScore) / (upperScore - lowerScore)) *
+          (aprMapping[upperScore].base - aprMapping[lowerScore].base);
+
+      // Adjust APR based on loan term
+      const minTerm = 1;
+      const maxTerm = 84;
+      const termAdjustment =
+        ((loanTerm - minTerm) / (maxTerm - minTerm)) * termFactor;
+
+      const adjustedAPR = baseAPR + termAdjustment;
+
+      // Clamp APR to [8%, 36%]
+      return Math.max(8, Math.min(adjustedAPR, 36));
     }
 
     function calculateMonthlyInterest(loanAmount, apr) {
