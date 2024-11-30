@@ -115,14 +115,19 @@
     };
 
     function getInterpolatedAPR(creditScore, loanTerm) {
-      const scoreKeys = Object.keys(aprMapping).map(Number);
-      const closestScore = scoreKeys.reduce((prev, curr) =>
-        Math.abs(curr - creditScore) < Math.abs(prev - creditScore) ? curr : prev
-      );
+      const roundedCreditScore = Math.floor(creditScore / 20) * 20;
+      const roundedLoanTerm = loanTerm;
 
-      const termKeys = Object.keys(aprMapping[closestScore]).map(Number);
-      const closestTerm = termKeys.reduce((prev, curr) =>
-        Math.abs(curr - loanTerm) < Math.abs(prev - loanTerm) ? curr : prev
-      );
+      if (aprMapping[roundedCreditScore] && aprMapping[roundedCreditScore][roundedLoanTerm]) {
+        return aprMapping[roundedCreditScore][roundedLoanTerm];
+      }
 
-      return aprMapping[closestScore][closestTerm] || 0; // Return 0 if no match
+      return 0; // Default to 0 if no match is found
+    }
+
+    function calculateMonthlyInterest(loanAmount, apr) {
+      const monthlyRate = apr / 12 / 100;
+      return loanAmount * monthlyRate;
+    }
+
+    function updateCalculator()
