@@ -96,28 +96,40 @@
   </div>
 
   <script>
-    function calculateAPR(creditScore, loanTerm) {
+    const aprMapping = {
+      "500-599": { 1: 30.99, 12: 30.99, 13: 35.99, 36: 35.99, 37: 33.99, 60: 33.99, 61: 32.99, 84: 32.99 },
+      "600-699": { 1: 18.99, 12: 18.99, 13: 19.99, 36: 19.99, 37: 21.99, 60: 21.99, 61: 22.99, 84: 22.99 },
+      "700-850": { 1: 7.99, 12: 7.99, 13: 8.99, 36: 8.99, 37: 11.99, 60: 11.99, 61: 13.99, 84: 13.99 },
+    };
+
+    function getInterpolatedAPR(creditScore, loanTerm) {
+      let range;
       if (creditScore >= 500 && creditScore <= 599) {
-        if (loanTerm <= 12) return 0.3099; // 30.99%
-        else if (loanTerm <= 36) return 0.3599; // 35.99%
-        else if (loanTerm <= 60) return 0.3399; // 33.99%
-        else if (loanTerm <= 84) return 0.3299; // 32.99%
+        range = "500-599";
       } else if (creditScore >= 600 && creditScore <= 699) {
-        if (loanTerm <= 12) return 0.1899; // 18.99%
-        else if (loanTerm <= 36) return 0.1999; // 19.99%
-        else if (loanTerm <= 60) return 0.2199; // 21.99%
-        else if (loanTerm <= 84) return 0.2299; // 22.99%
+        range = "600-699";
       } else if (creditScore >= 700 && creditScore <= 850) {
-        if (loanTerm <= 12) return 0.0799; // 7.99%
-        else if (loanTerm <= 36) return 0.0899; // 8.99%
-        else if (loanTerm <= 60) return 0.1199; // 11.99%
-        else if (loanTerm <= 84) return 0.1399; // 13.99%
+        range = "700-850";
       }
-      return 0.36; // Default max APR cap
+
+      const terms = Object.keys(aprMapping[range]).map(Number);
+      const aprs = Object.values(aprMapping[range]);
+
+      return linearInterpolation(terms, aprs, loanTerm);
+    }
+
+    function linearInterpolation(x, y, xi) {
+      for (let i = 0; i < x.length - 1; i++) {
+        if (xi >= x[i] && xi <= x[i + 1]) {
+          const slope = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
+          return y[i] + slope * (xi - x[i]);
+        }
+      }
+      return y[y.length - 1];
     }
 
     function calculateMonthlyInterest(loanAmount, apr) {
-      const monthlyRate = apr / 12;
+      const monthlyRate = apr / 12 / 100;
       return loanAmount * monthlyRate;
     }
 
@@ -126,23 +138,20 @@
       const loanTerm = parseInt(document.getElementById('loanTerm').value, 10);
       const creditScore = parseInt(document.getElementById('creditScore').value, 10);
 
-      const apr = calculateAPR(creditScore, loanTerm);
+      const apr = getInterpolatedAPR(creditScore, loanTerm);
       const monthlyInterest = calculateMonthlyInterest(loanAmount, apr);
 
-      // Update UI
       document.getElementById('loanAmountValue').textContent = `$${loanAmount.toLocaleString()}`;
       document.getElementById('loanTermValue').textContent = `${loanTerm} Months`;
       document.getElementById('creditScoreValue').textContent = `${creditScore}`;
-      document.getElementById('apr').textContent = `${(apr * 100).toFixed(2)}%`;
+      document.getElementById('apr').textContent = `${apr.toFixed(2)}%`;
       document.getElementById('monthlyInterest').textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
     }
 
-    // Event Listeners
     document.getElementById('loanAmount').addEventListener('input', updateCalculator);
     document.getElementById('loanTerm').addEventListener('input', updateCalculator);
     document.getElementById('creditScore').addEventListener('input', updateCalculator);
 
-    // Initialize
     updateCalculator();
   </script>
 </body>
