@@ -4,7 +4,141 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loan Calculator</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Fonts and colors matching IncredibleFi */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .calculator-container {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .results {
+      text-align: center;
+      border-bottom: 2px solid #eeeeee;
+      padding-bottom: 20px;
+    }
+
+    .results h1 {
+      font-size: 48px;
+      color: #2d3436;
+      margin: 0;
+    }
+
+    .results p {
+      font-size: 16px;
+      color: #636e72;
+      margin: 8px 0;
+    }
+
+    .approval-odds-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .approval-bar {
+      height: 20px;
+      background: #dfe6e9;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      margin: 10px 0;
+    }
+
+    .approval-bar-fill {
+      height: 100%;
+      width: 0;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    .approval-text {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+
+    .inputs {
+      margin-top: 20px;
+    }
+
+    .slider-container {
+      margin-bottom: 20px;
+    }
+
+    .slider-container label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      color: #2d3436;
+      margin-bottom: 8px;
+    }
+
+    .slider-container input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      background: #dfe6e9;
+      border-radius: 5px;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #0984e3;
+      cursor: pointer;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider-value {
+      text-align: right;
+      font-weight: 600;
+      font-size: 14px;
+      color: #636e72;
+      margin-top: 5px;
+    }
+
+    .cta-button {
+      margin-top: 20px;
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 15px 20px;
+      background-color: #0984e3;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      text-decoration: none;
+      transition: background 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .cta-button:hover {
+      background-color: #074fb2;
+    }
+  </style>
 </head>
 <body>
   <div class="calculator-container">
@@ -12,10 +146,12 @@
       <p>Estimated Monthly Interest Payment</p>
       <h1 id="monthlyInterest">$0</h1>
       <p><span id="apr">0.00%</span> APR</p>
-      <div class="approval-bar-container">
-        <div id="approvalBar" class="approval-bar"></div>
+    </div>
+    <div class="approval-odds-container">
+      <div class="approval-bar">
+        <div class="approval-bar-fill" id="approvalBarFill"></div>
       </div>
-      <p id="approvalText" class="approval-text">Let's get started!</p>
+      <p class="approval-text" id="approvalText">Approval Odds: Unknown</p>
     </div>
     <div class="inputs">
       <div class="slider-container">
@@ -37,6 +173,110 @@
     <a href="#" class="cta-button">Check Your Rate</a>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const aprMapping = {
+      500: { base: 36.00 },
+      600: { base: 22.00 },
+      700: { base: 12.00 },
+      850: { base: 8.00 },
+    };
+
+    const termFactor = 5;
+
+    function interpolateAPR(creditScore, loanTerm) {
+      const creditScores = Object.keys(aprMapping).map(Number).sort((a, b) => a - b);
+      let lowerScore = creditScores[0];
+      let upperScore = creditScores[creditScores.length - 1];
+
+      for (let i = 0; i < creditScores.length - 1; i++) {
+        if (creditScore >= creditScores[i] && creditScore <= creditScores[i + 1]) {
+          lowerScore = creditScores[i];
+          upperScore = creditScores[i + 1];
+          break;
+        }
+      }
+
+      const baseAPR =
+        aprMapping[lowerScore].base +
+        ((creditScore - lowerScore) / (upperScore - lowerScore)) *
+          (aprMapping[upperScore].base - aprMapping[lowerScore].base);
+
+      const minTerm = 1;
+      const maxTerm = 84;
+      const termAdjustment =
+        ((loanTerm - minTerm) / (maxTerm - minTerm)) * termFactor;
+
+      const adjustedAPR = baseAPR + termAdjustment;
+      return Math.max(8, Math.min(adjustedAPR, 36));
+    }
+
+    function calculateApprovalOdds(creditScore, loanAmount, loanTerm) {
+      let baseOdds;
+      if (creditScore < 600) baseOdds = 15;
+      else if (creditScore < 660) baseOdds = 30;
+      else if (creditScore < 720) baseOdds = 50;
+      else if (creditScore < 760) baseOdds = 70;
+      else if (creditScore < 800) baseOdds = 85;
+      else baseOdds = 95;
+
+      const amountAdjustment = loanAmount < 20000 ? 10 : loanAmount > 30000 ? -10 : 0;
+      const termAdjustment = loanTerm > 60 ? -5 : loanTerm <= 24 ? 5 : 0;
+
+      let approvalOdds = baseOdds + amountAdjustment + termAdjustment;
+      return Math.max(0, Math.min(approvalOdds, 100));
+    }
+
+    function calculateMonthlyInterest(loanAmount, apr) {
+      const monthlyRate = apr / 12 / 100;
+      return loanAmount * monthlyRate;
+    }
+
+    function updateCalculator() {
+      const loanAmount = parseInt(document.getElementById('loanAmount').value, 10);
+      const loanTerm = parseInt(document.getElementById('loanTerm').value, 10);
+      const creditScore = parseInt(document.getElementById('creditScore').value, 10);
+
+      const apr = interpolateAPR(creditScore, loanTerm);
+      const monthlyInterest = calculateMonthlyInterest(loanAmount, apr);
+      const approvalOdds = calculateApprovalOdds(creditScore, loanAmount, loanTerm);
+
+      document.getElementById('loanAmountValue').textContent = `$${loanAmount.toLocaleString()}`;
+      document.getElementById('loanTermValue').textContent = `${loanTerm} Months`;
+      document.getElementById('creditScoreValue').textContent = `${creditScore}`;
+      document.getElementById('apr').textContent = `${apr.toFixed(2)}%`;
+      document.getElementById('monthlyInterest').textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
+
+      const approvalBarFill = document.getElementById('approvalBarFill');
+      const approvalText = document.getElementById('approvalText');
+
+      // Update approval odds bar width and color
+      approvalBarFill.style.width = `${approvalOdds}%`;
+      approvalBarFill.style.backgroundColor =
+        approvalOdds > 70
+          ? '#4CAF50' // Green for high odds
+          : approvalOdds > 40
+          ? '#FFC107' // Yellow for medium odds
+          : approvalOdds > 20
+          ? '#FF9800' // Orange for low odds
+          : '#F44336'; // Red for very low odds
+
+      // Update approval text
+      approvalText.textContent =
+        approvalOdds > 70
+          ? 'Great choice! Lenders love this combination!'
+          : approvalOdds > 40
+          ? 'Looking good! You’re on the right track.'
+          : approvalOdds > 20
+          ? 'Not bad! Consider lowering your loan amount or term for better chances.'
+          : 'This combination may need tweaking. Try improving your credit score or loan term.';
+    }
+
+    document.getElementById('loanAmount').addEventListener('input', updateCalculator);
+    document.getElementById('loanTerm').addEventListener('input', updateCalculator);
+    document.getElementById('creditScore').addEventListener('input', updateCalculator);
+
+    // Initialize calculator on load
+    updateCalculator();
+  </script>
 </body>
 </html>
