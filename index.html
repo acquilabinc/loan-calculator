@@ -210,15 +210,20 @@
       return Math.max(8, Math.min(adjustedAPR, 36));
     }
 
-    function calculateApprovalOdds(creditScore, loanAmount) {
-      const maxScore = 850;
-      const minScore = 500;
-      const maxLoan = 40000;
+    function calculateApprovalOdds(creditScore, loanAmount, loanTerm) {
+      let baseOdds;
+      if (creditScore < 600) baseOdds = 15;
+      else if (creditScore < 660) baseOdds = 30;
+      else if (creditScore < 720) baseOdds = 50;
+      else if (creditScore < 760) baseOdds = 70;
+      else if (creditScore < 800) baseOdds = 85;
+      else baseOdds = 95;
 
-      const scoreOdds = ((creditScore - minScore) / (maxScore - minScore)) * 100;
-      const loanOdds = (1 - loanAmount / maxLoan) * 100;
+      const amountAdjustment = loanAmount < 20000 ? 10 : loanAmount > 30000 ? -10 : 0;
+      const termAdjustment = loanTerm > 60 ? -5 : loanTerm <= 24 ? 5 : 0;
 
-      return Math.max(0, Math.min((scoreOdds + loanOdds) / 2, 100));
+      let approvalOdds = baseOdds + amountAdjustment + termAdjustment;
+      return Math.max(0, Math.min(approvalOdds, 100));
     }
 
     function calculateMonthlyInterest(loanAmount, apr) {
@@ -233,31 +238,44 @@
 
       const apr = interpolateAPR(creditScore, loanTerm);
       const monthlyInterest = calculateMonthlyInterest(loanAmount, apr);
-      const approvalOdds = calculateApprovalOdds(creditScore, loanAmount);
-
-      const approvalBarFill = document.getElementById('approvalBarFill');
-      const approvalText = document.getElementById('approvalText');
-
-      approvalBarFill.style.width = `${approvalOdds}%`;
-      approvalBarFill.style.backgroundColor = approvalOdds > 70 ? '#00b894' : approvalOdds > 30 ? '#fdcb6e' : '#d63031';
-      approvalText.textContent =
-        approvalOdds > 70
-          ? 'Great choice! Lenders love this combination!'
-          : approvalOdds > 30
-          ? 'Not bad! Smaller adjustments can help.'
-          : 'This combo may need tweaking. Adjust inputs!';
+      const approvalOdds = calculateApprovalOdds(creditScore, loanAmount, loanTerm);
 
       document.getElementById('loanAmountValue').textContent = `$${loanAmount.toLocaleString()}`;
       document.getElementById('loanTermValue').textContent = `${loanTerm} Months`;
       document.getElementById('creditScoreValue').textContent = `${creditScore}`;
       document.getElementById('apr').textContent = `${apr.toFixed(2)}%`;
       document.getElementById('monthlyInterest').textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
+
+      const approvalBarFill = document.getElementById('approvalBarFill');
+      const approvalText = document.getElementById('approvalText');
+
+      // Update approval odds bar width and color
+      approvalBarFill.style.width = `${approvalOdds}%`;
+      approvalBarFill.style.backgroundColor =
+        approvalOdds > 70
+          ? '#4CAF50' // Green for high odds
+          : approvalOdds > 40
+          ? '#FFC107' // Yellow for medium odds
+          : approvalOdds > 20
+          ? '#FF9800' // Orange for low odds
+          : '#F44336'; // Red for very low odds
+
+      // Update approval text
+      approvalText.textContent =
+        approvalOdds > 70
+          ? 'Great choice! Lenders love this combination!'
+          : approvalOdds > 40
+          ? 'Looking good! You’re on the right track.'
+          : approvalOdds > 20
+          ? 'Not bad! Consider lowering your loan amount or term for better chances.'
+          : 'This combination may need tweaking. Try improving your credit score or loan term.';
     }
 
     document.getElementById('loanAmount').addEventListener('input', updateCalculator);
     document.getElementById('loanTerm').addEventListener('input', updateCalculator);
     document.getElementById('creditScore').addEventListener('input', updateCalculator);
 
+    // Initialize calculator on load
     updateCalculator();
   </script>
 </body>
