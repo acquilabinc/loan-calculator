@@ -1,105 +1,60 @@
-function interpolateAPR(creditScore, loanTerm) {
-  const aprMapping = {
-    500: 36.0,
-    600: 22.0,
-    700: 12.0,
-    850: 8.0,
-  };
+const loanAmount = document.getElementById("loanAmount");
+const loanTerm = document.getElementById("loanTerm");
+const creditScore = document.getElementById("creditScore");
 
-  const creditScores = Object.keys(aprMapping).map(Number).sort((a, b) => a - b);
-  let lowerScore = creditScores[0];
-  let upperScore = creditScores[creditScores.length - 1];
+const loanAmountValue = document.getElementById("loanAmountValue");
+const loanTermValue = document.getElementById("loanTermValue");
+const creditScoreValue = document.getElementById("creditScoreValue");
 
-  // Find closest range for interpolation
-  for (let i = 0; i < creditScores.length - 1; i++) {
-    if (creditScore >= creditScores[i] && creditScore <= creditScores[i + 1]) {
-      lowerScore = creditScores[i];
-      upperScore = creditScores[i + 1];
-      break;
-    }
-  }
+const monthlyInterest = document.getElementById("monthlyInterest");
+const aprDisplay = document.getElementById("aprDisplay");
+const oddsBar = document.getElementById("oddsBar");
+const oddsText = document.getElementById("oddsText");
 
-  // Base APR calculation
-  const baseAPR =
-    aprMapping[lowerScore] +
-    ((creditScore - lowerScore) / (upperScore - lowerScore)) *
-      (aprMapping[upperScore] - aprMapping[lowerScore]);
+function calculateApprovalOdds(amount, score, term) {
+  let baseOdds = score > 720 ? 0.9 : score > 640 ? 0.7 : 0.5;
+  baseOdds -= amount > 20000 ? 0.1 : 0;
+  baseOdds -= term > 36 ? 0.1 : 0;
 
-  // Adjust APR based on loan term
-  const termFactor = ((loanTerm - 1) / (84 - 1)) * 5; // Adjust factor for term
-  const adjustedAPR = baseAPR + termFactor;
-
-  // Clamp APR between 8% and 36%
-  return Math.min(36, Math.max(8, adjustedAPR));
+  return Math.min(Math.max(baseOdds, 0), 1); // Clamp between 0 and 1
 }
 
-function calculateMonthlyInterest(loanAmount, apr) {
-  const monthlyRate = apr / 12 / 100; // Convert APR to monthly interest rate
-  return loanAmount * monthlyRate;
+function updateOddsVisual(odds) {
+  const oddsPercentage = Math.round(odds * 100);
+  oddsBar.style.setProperty("--width", `${oddsPercentage}%`);
+  oddsBar.style.backgroundColor = odds > 0.7 ? "green" : odds > 0.4 ? "orange" : "red";
+  oddsText.textContent =
+    odds > 0.7
+      ? "Great choice! Lenders love this combination!"
+      : odds > 0.4
+      ? "Not bad! Consider lowering your loan amount for better chances."
+      : "This combination might be tough. Try adjusting your loan amount.";
 }
 
-function calculateApprovalOdds(loanAmount, creditScore, loanTerm) {
-  const baseOdds = creditScore >= 720 ? 0.85 : creditScore >= 620 ? 0.65 : 0.4;
-  const loanFactor = loanAmount <= 20000 ? 0.2 : loanAmount <= 30000 ? 0.1 : -0.15;
-  const termFactor = loanTerm <= 24 ? 0.1 : loanTerm <= 60 ? -0.05 : -0.15;
-
-  // Combine all factors to calculate odds
-  let odds = baseOdds + loanFactor + termFactor;
-  return Math.max(0, Math.min(1, odds)); // Clamp between 0 and 1
+function calculateAPR(score, term) {
+  return score > 720 ? 10 : score > 640 ? 20 : 30; // Example APR logic
 }
 
 function updateCalculator() {
-  const loanAmount = parseInt(document.getElementById("loanAmount").value, 10);
-  const loanTerm = parseInt(document.getElementById("loanTerm").value, 10);
-  const creditScore = parseInt(document.getElementById("creditScore").value, 10);
+  const amount = parseInt(loanAmount.value, 10);
+  const term = parseInt(loanTerm.value, 10);
+  const score = parseInt(creditScore.value, 10);
 
-  const apr = interpolateAPR(creditScore, loanTerm);
-  const monthlyInterest = calculateMonthlyInterest(loanAmount, apr);
+  const odds = calculateApprovalOdds(amount, score, term);
+  const apr = calculateAPR(score, term);
 
-  // Update UI with calculated values
-  document.getElementById("loanAmountValue").textContent = `$${loanAmount.toLocaleString()}`;
-  document.getElementById("loanTermValue").textContent = `${loanTerm} Months`;
-  document.getElementById("creditScoreValue").textContent = `${creditScore}`;
-  document.getElementById("apr").textContent = `${apr.toFixed(2)}%`;
-  document.getElementById("monthlyInterest").textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
+  loanAmountValue.textContent = `$${amount.toLocaleString()}`;
+  loanTermValue.textContent = `${term} Months`;
+  creditScoreValue.textContent = `${score}`;
 
-  // Calculate approval odds
-  const approvalOdds = calculateApprovalOdds(loanAmount, creditScore, loanTerm);
-  const button = document.querySelector(".cta-button");
-  const oddsBar = document.querySelector(".approval-bar");
-  const oddsText = document.querySelector(".approval-text");
+  monthlyInterest.textContent = `$${((amount * apr) / 1200).toFixed(0)}`;
+  aprDisplay.textContent = `${apr.toFixed(2)}% APR`;
 
-  // Update approval odds bar and button
-  oddsBar.style.width = `${approvalOdds * 100}%`;
-
-  if (approvalOdds > 0.7) {
-    oddsBar.style.backgroundColor = "#4caf50"; // Green
-    oddsText.textContent = "Great choice! Lenders love this combination!";
-    button.className = "cta-button green";
-    button.textContent = "Great Choice! Check Your Rate";
-  } else if (approvalOdds > 0.3) {
-    oddsBar.style.backgroundColor = "#ffeb3b"; // Yellow
-    oddsText.textContent = "Not bad! Consider lowering your loan amount or term.";
-    button.className = "cta-button yellow";
-    button.textContent = "Not Bad! Check Your Rate";
-  } else {
-    oddsBar.style.backgroundColor = "#f44336"; // Red
-    oddsText.textContent = "This combo may be tough. Try adjusting your loan.";
-    button.className = "cta-button red";
-    button.textContent = "Consider Tweaking! Check Your Rate";
-  }
-
-  // Disable button if no odds or invalid inputs
-  if (approvalOdds === 0 || monthlyInterest === 0) {
-    button.className = "cta-button disabled";
-    button.textContent = "Unavailable";
-  }
+  updateOddsVisual(odds);
 }
 
-// Event listeners for real-time updates
-document.getElementById("loanAmount").addEventListener("input", updateCalculator);
-document.getElementById("loanTerm").addEventListener("input", updateCalculator);
-document.getElementById("creditScore").addEventListener("input", updateCalculator);
+loanAmount.addEventListener("input", updateCalculator);
+loanTerm.addEventListener("input", updateCalculator);
+creditScore.addEventListener("input", updateCalculator);
 
-// Initialize calculator
 updateCalculator();
