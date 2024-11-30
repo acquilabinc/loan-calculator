@@ -18,19 +18,19 @@
 
     .calculator-container {
       display: flex;
+      flex-direction: column;
       gap: 20px;
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       padding: 20px;
-      width: 800px;
+      width: 600px;
     }
 
     .results {
-      flex: 1;
       text-align: center;
-      border-right: 2px solid #ececec;
-      padding-right: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #ececec;
     }
 
     .results h1 {
@@ -40,11 +40,11 @@
 
     .results p {
       margin: 10px 0;
+      font-size: 18px;
     }
 
     .inputs {
-      flex: 1;
-      padding-left: 20px;
+      padding-top: 20px;
     }
 
     .slider-container {
@@ -55,6 +55,7 @@
       display: block;
       font-weight: bold;
       margin-bottom: 5px;
+      font-size: 16px;
     }
 
     .slider-container input[type="range"] {
@@ -64,6 +65,7 @@
     .slider-value {
       text-align: right;
       font-weight: bold;
+      font-size: 16px;
     }
   </style>
 </head>
@@ -73,8 +75,6 @@
       <p>Estimated Monthly Interest Payment</p>
       <h1 id="monthlyInterest">$0</h1>
       <p><span id="apr">0.00%</span> APR</p>
-      <p>Total Cost: $<span id="totalCost">0</span></p>
-      <p>Interest Paid: $<span id="interestPaid">0</span></p>
     </div>
     <div class="inputs">
       <div class="slider-container">
@@ -128,8 +128,6 @@
 
       const apr = calculateAPR(creditScore, loanTerm);
       const monthlyInterest = calculateMonthlyInterest(loanAmount, apr);
-      const totalCost = monthlyInterest * loanTerm + loanAmount;
-      const interestPaid = totalCost - loanAmount;
 
       // Update UI
       document.getElementById('loanAmountValue').textContent = `$${loanAmount.toLocaleString()}`;
@@ -137,8 +135,6 @@
       document.getElementById('creditScoreValue').textContent = `${creditScore}`;
       document.getElementById('apr').textContent = `${(apr * 100).toFixed(2)}%`;
       document.getElementById('monthlyInterest').textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
-      document.getElementById('totalCost').textContent = `$${Math.round(totalCost).toLocaleString()}`;
-      document.getElementById('interestPaid').textContent = `$${Math.round(interestPaid).toLocaleString()}`;
     }
 
     // Event Listeners
