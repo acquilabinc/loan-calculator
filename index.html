@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loan Calculator</title>
   <style>
-    /* Fonts and colors matching IncredibleFi */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f4f4f4;
@@ -27,6 +27,7 @@
       width: 100%;
       margin: 0 auto;
       box-sizing: border-box;
+      position: relative;
     }
 
     .results {
@@ -143,6 +144,14 @@
     .cta-button:hover {
       background-color: #074fb2;
     }
+
+    .disclaimer {
+      font-size: 12px;
+      color: #636e72;
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -176,6 +185,9 @@
       </div>
     </div>
     <a href="#" class="cta-button">Check Your Rate</a>
+    <p class="disclaimer">
+      Disclaimer: Approval estimates provided by this tool are for informational purposes only and do not guarantee loan approval. Final decisions are subject to a full credit evaluation and may consider factors such as your credit history, debt-to-income ratio, employment status, and other financial obligations.
+    </p>
   </div>
 
   <script>
