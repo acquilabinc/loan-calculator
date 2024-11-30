@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loan Calculator</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS -->
 </head>
 <body>
   <div class="calculator-container">
@@ -12,6 +12,12 @@
       <p>Estimated Monthly Interest Payment</p>
       <h1 id="monthlyInterest">$0</h1>
       <p><span id="apr">0.00%</span> APR</p>
+    </div>
+    <div class="approval-odds">
+      <div class="approval-bar-container">
+        <div class="approval-bar"></div>
+      </div>
+      <p class="approval-text">Adjust the sliders to see your approval odds.</p>
     </div>
     <div class="inputs">
       <div class="slider-container">
@@ -30,8 +36,8 @@
         <div class="slider-value" id="creditScoreValue">700</div>
       </div>
     </div>
-    <a href="#" class="cta-button disabled">Unavailable</a>
+    <a href="#" class="cta-button">Check Your Rate</a>
   </div>
-  <script src="script.js"></script>
+  <script src="script.js"></script> <!-- Link to external JS -->
 </body>
 </html>
