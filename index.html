@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loan Calculator</title>
   <style>
+    /* Fonts and colors matching IncredibleFi */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f4f4;
       margin: 0;
       padding: 20px;
       display: flex;
@@ -17,34 +19,34 @@
     }
 
     .calculator-container {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      width: 600px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
     }
 
     .results {
       text-align: center;
+      border-bottom: 2px solid #eeeeee;
       padding-bottom: 20px;
-      border-bottom: 2px solid #ececec;
     }
 
     .results h1 {
       font-size: 48px;
+      color: #2d3436;
       margin: 0;
     }
 
     .results p {
-      margin: 10px 0;
-      font-size: 18px;
+      font-size: 16px;
+      color: #636e72;
+      margin: 8px 0;
     }
 
     .inputs {
-      padding-top: 20px;
+      margin-top: 20px;
     }
 
     .slider-container {
@@ -53,20 +55,68 @@
 
     .slider-container label {
       display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-      font-size: 16px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #2d3436;
+      margin-bottom: 8px;
     }
 
     .slider-container input[type="range"] {
       width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      background: #dfe6e9;
+      border-radius: 5px;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #0984e3;
+      cursor: pointer;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider-container input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #0984e3;
+      cursor: pointer;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .slider-value {
       text-align: right;
-      font-weight: bold;
-      font-size: 16px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #636e72;
       margin-top: 5px;
+    }
+
+    .cta-button {
+      margin-top: 20px;
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 15px 20px;
+      background-color: #0984e3;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background-color: #074fb2;
     }
   </style>
 </head>
@@ -94,6 +144,7 @@
         <div class="slider-value" id="creditScoreValue">700</div>
       </div>
     </div>
+    <a href="#" class="cta-button">Apply Now</a>
   </div>
 
   <script>
@@ -111,7 +162,6 @@
       let lowerScore = creditScores[0];
       let upperScore = creditScores[creditScores.length - 1];
 
-      // Find closest credit score range
       for (let i = 0; i < creditScores.length - 1; i++) {
         if (creditScore >= creditScores[i] && creditScore <= creditScores[i + 1]) {
           lowerScore = creditScores[i];
@@ -120,21 +170,17 @@
         }
       }
 
-      // Interpolate base APR based on credit score
       const baseAPR =
         aprMapping[lowerScore].base +
         ((creditScore - lowerScore) / (upperScore - lowerScore)) *
           (aprMapping[upperScore].base - aprMapping[lowerScore].base);
 
-      // Adjust APR based on loan term
       const minTerm = 1;
       const maxTerm = 84;
       const termAdjustment =
         ((loanTerm - minTerm) / (maxTerm - minTerm)) * termFactor;
 
       const adjustedAPR = baseAPR + termAdjustment;
-
-      // Clamp APR to [8%, 36%]
       return Math.max(8, Math.min(adjustedAPR, 36));
     }
 
@@ -151,7 +197,6 @@
       const apr = interpolateAPR(creditScore, loanTerm);
       const monthlyInterest = calculateMonthlyInterest(loanAmount, apr);
 
-      // Update UI
       document.getElementById('loanAmountValue').textContent = `$${loanAmount.toLocaleString()}`;
       document.getElementById('loanTermValue').textContent = `${loanTerm} Months`;
       document.getElementById('creditScoreValue').textContent = `${creditScore}`;
@@ -159,12 +204,10 @@
       document.getElementById('monthlyInterest').textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
     }
 
-    // Event Listeners
     document.getElementById('loanAmount').addEventListener('input', updateCalculator);
     document.getElementById('loanTerm').addEventListener('input', updateCalculator);
     document.getElementById('creditScore').addEventListener('input', updateCalculator);
 
-    // Initialize
     updateCalculator();
   </script>
 </body>
