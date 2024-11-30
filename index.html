@@ -273,10 +273,10 @@
         approvalOdds > 70
         ? 'Great choice! Lenders love this combination.'
         : approvalOdds > 40
-        ? 'Looking solid! Reducing the loan amount could improve your chances.'
+        ? 'You’re on the right track. A smaller loan amount might make approval easier.'
         : approvalOdds > 20
-        ? 'Approval is possible! Lowering the amount or term could help.'
-        : 'Approval is challenging under these terms but there is always a chance.';
+        ? 'Approval is within reach. Adjusting your loan amount or term could help.'
+        : 'Approval is challenging under these terms. Lower the amount or term.';
     }
 
     document.getElementById('loanAmount').addEventListener('input', updateCalculator);
