@@ -219,7 +219,14 @@
       else if (creditScore < 800) baseOdds = 85;
       else baseOdds = 95;
 
-      const amountAdjustment = loanAmount < 20000 ? 10 : loanAmount > 30000 ? -10 : 0;
+      const amountAdjustment =
+        loanAmount < 5000
+          ? 20
+          : loanAmount < 20000
+          ? 10
+          : loanAmount > 30000
+          ? -10
+          : 0;
       const termAdjustment = loanTerm > 60 ? -5 : loanTerm <= 24 ? 5 : 0;
 
       let approvalOdds = baseOdds + amountAdjustment + termAdjustment;
@@ -268,7 +275,7 @@
           ? 'Looking good! You’re on the right track.'
           : approvalOdds > 20
           ? 'Not bad! Consider lowering your loan amount or term for better chances.'
-          : 'This combination may need tweaking. Try improving your credit score or loan term.';
+          : 'This combination may need tweaking. Try adjusting your loan terms.';
     }
 
     document.getElementById('loanAmount').addEventListener('input', updateCalculator);
