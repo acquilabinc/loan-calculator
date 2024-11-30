@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.calculator-container {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.results {
+  text-align: center;
+  border-bottom: 2px solid #eeeeee;
+  padding-bottom: 20px;
+}
+
+.results h1 {
+  font-size: 48px;
+  color: #2d3436;
+  margin: 0;
+}
+
+.results p {
+  font-size: 16px;
+  color: #636e72;
+  margin: 8px 0;
+}
+
+.inputs {
+  margin-top: 20px;
+}
+
+.slider-container {
+  margin-bottom: 20px;
+}
+
+.slider-container label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  color: #2d3436;
+  margin-bottom: 8px;
+}
+
+.slider-container input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  background: #dfe6e9;
+  border-radius: 5px;
+  outline: none;
+  transition: background 0.3s;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0984e3;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider-container input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0984e3;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider-value {
+  text-align: right;
+  font-weight: 600;
+  font-size: 14px;
+  color: #636e72;
+  margin-top: 5px;
+}
+
+.cta-button {
+  margin-top: 20px;
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 15px 20px;
+  font-weight: 700;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: background 0.3s ease, opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.cta-button.green {
+  background-color: #4caf50;
+  color: white;
+}
+
+.cta-button.yellow {
+  background-color: #ffeb3b;
+  color: #333;
+}
+
+.cta-button.red {
+  background-color: #f44336;
+  color: white;
+}
+
+.cta-button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
