@@ -70,8 +70,8 @@
 <body>
   <div class="calculator-container">
     <div class="results">
-      <p>Estimated Monthly Payment</p>
-      <h1 id="monthlyPayment">$0</h1>
+      <p>Estimated Monthly Interest Payment</p>
+      <h1 id="monthlyInterest">$0</h1>
       <p><span id="apr">0.00%</span> APR</p>
       <p>Total Cost: $<span id="totalCost">0</span></p>
       <p>Interest Paid: $<span id="interestPaid">0</span></p>
@@ -116,13 +116,9 @@
       return 0.36; // Default max APR cap
     }
 
-    function calculateMonthlyPayment(loanAmount, apr, loanTerm) {
+    function calculateMonthlyInterest(loanAmount, apr) {
       const monthlyRate = apr / 12;
-      if (loanTerm > 0) {
-        return (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, loanTerm)) /
-               (Math.pow(1 + monthlyRate, loanTerm) - 1);
-      }
-      return 0;
+      return loanAmount * monthlyRate;
     }
 
     function updateCalculator() {
@@ -131,8 +127,8 @@
       const creditScore = parseInt(document.getElementById('creditScore').value, 10);
 
       const apr = calculateAPR(creditScore, loanTerm);
-      const monthlyPayment = calculateMonthlyPayment(loanAmount, apr, loanTerm);
-      const totalCost = monthlyPayment * loanTerm;
+      const monthlyInterest = calculateMonthlyInterest(loanAmount, apr);
+      const totalCost = monthlyInterest * loanTerm + loanAmount;
       const interestPaid = totalCost - loanAmount;
 
       // Update UI
@@ -140,7 +136,7 @@
       document.getElementById('loanTermValue').textContent = `${loanTerm} Months`;
       document.getElementById('creditScoreValue').textContent = `${creditScore}`;
       document.getElementById('apr').textContent = `${(apr * 100).toFixed(2)}%`;
-      document.getElementById('monthlyPayment').textContent = `$${Math.round(monthlyPayment).toLocaleString()}`;
+      document.getElementById('monthlyInterest').textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
       document.getElementById('totalCost').textContent = `$${Math.round(totalCost).toLocaleString()}`;
       document.getElementById('interestPaid').textContent = `$${Math.round(interestPaid).toLocaleString()}`;
     }
