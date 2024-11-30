@@ -118,16 +118,15 @@
       const roundedCreditScore = Math.floor(creditScore / 20) * 20;
       const roundedLoanTerm = loanTerm;
 
-      if (aprMapping[roundedCreditScore] && aprMapping[roundedCreditScore][roundedLoanTerm]) {
-        return aprMapping[roundedCreditScore][roundedLoanTerm];
-      }
+      console.log("Rounded Credit Score:", roundedCreditScore);
+      console.log("Rounded Loan Term:", roundedLoanTerm);
 
-      return 0; // Default to 0 if no match is found
-    }
-
-    function calculateMonthlyInterest(loanAmount, apr) {
-      const monthlyRate = apr / 12 / 100;
-      return loanAmount * monthlyRate;
-    }
-
-    function updateCalculator()
+      if (aprMapping[roundedCreditScore]) {
+        const termAPR = aprMapping[roundedCreditScore][roundedLoanTerm];
+        if (termAPR) {
+          return termAPR;
+        } else {
+          console.log("No APR found for Loan Term:", roundedLoanTerm);
+        }
+      } else {
+        console.log("No
