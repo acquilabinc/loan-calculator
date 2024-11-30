@@ -156,7 +156,7 @@
       document.getElementById('loanTermValue').textContent = `${loanTerm} Months`;
       document.getElementById('creditScoreValue').textContent = `${creditScore}`;
       document.getElementById('apr').textContent = `${apr.toFixed(2)}%`;
-      document.getElementById('monthlyInterest').textContent = `$${monthlyInterest.toFixed(2).toLocaleString()}`;
+      document.getElementById('monthlyInterest').textContent = `$${Math.round(monthlyInterest).toLocaleString()}`;
     }
 
     // Event Listeners
